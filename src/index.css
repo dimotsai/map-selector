@@ -1,4 +1,11 @@
-html, body, #app {
+html, body, #root, #app {
     height: 100%;
     margin: 0;
+}
+
+#panel {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    background: white;
 }

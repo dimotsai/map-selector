@@ -1,5 +1,5 @@
 import React from 'react';
-import {GoogleMapLoader, GoogleMap, Marker} from "react-google-maps";
+import {GoogleMapLoader, GoogleMap, Marker, DrawingManager} from "react-google-maps";
 
 export default function Map (props) {
   return (
@@ -15,18 +15,34 @@ export default function Map (props) {
         }
         googleMapElement={
           <GoogleMap
-            ref={(map) => console.log(map)}
-            defaultZoom={3}
-            defaultCenter={{ lat: -25.363882, lng: 131.044922 }}
+            defaultZoom={8}
+            defaultCenter={{ lat: 23.747379, lng: 120.920539 }}
             onClick={props.onMapClick}
           >
-            {props.markers.map((marker, index) => {
-              return (
-                <Marker
-                  {...marker}
-                  onRightclick={() => props.onMarkerRightclick(index)} />
-              );
-            })}
+            <DrawingManager
+              defaultDrawingMode={google.maps.drawing.OverlayType.RECTANGLE}
+              defaultOptions={{
+                drawingControl: true,
+                drawingControlOptions: {
+                  position: google.maps.ControlPosition.TOP_CENTER,
+                  drawingModes: [
+                    google.maps.drawing.OverlayType.RECTANGLE,
+                  ],
+                },
+                rectangleOptions: {
+                  fillOpacity: 0.5,
+                  clickable: false,
+                  editable: false
+                },
+                circleOptions: {
+                  fillOpacity: 0.5,
+                  strokeWeight: 5,
+                  clickable: false,
+                  editable: false
+                },
+              }}
+              onRectanglecomplete={props.onRectanglecomplete}
+            />
           </GoogleMap>
         }
       />

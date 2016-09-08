@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import Map from './Map';
+import Panel from './Panel';
 import update from "react-addons-update";
 
 class App extends React.Component {
@@ -14,10 +15,12 @@ class App extends React.Component {
             key: 'Taiwan',
             defaultAnimation: 2,
         }],
+        rectangles: []
     };
 
     handleMapClick = this.handleMapClick.bind(this);
     handleMarkerRightclick = this.handleMarkerRightclick.bind(this);
+    handleRectanglecomplete = this.handleRectanglecomplete.bind(this);
 
     componentDidMount() {
         setTimeout(() => {
@@ -71,14 +74,24 @@ class App extends React.Component {
         this.setState({ markers });
     }
 
+    handleRectanglecomplete(rect) {
+        let { rectangles } = this.state;
+        rectangles = update(rectangles, {
+            $push: [rect]
+        });
+        this.setState({ rectangles })
+    }
+
     render() {
-        return (
+        return (<div id="app">
             <Map
-            markers={this.state.markers}
-            onMapClick={this.handleMapClick}
-            onMarkerRightclick={this.handleMarkerRightclick}
-            />
-        );
+                markers={this.state.markers}
+                onMapClick={this.handleMapClick}
+                onMarkerRightclick={this.handleMarkerRightclick}
+                onRectanglecomplete={this.handleRectanglecomplete}
+                />
+            <Panel rectangles={this.state.rectangles} />
+        </div>);
     }
 }
 
