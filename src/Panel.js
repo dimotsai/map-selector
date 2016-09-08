@@ -10,6 +10,7 @@ import IconButton from 'material-ui/IconButton';
 import Divider from 'material-ui/Divider';
 import ActionDelete from 'material-ui/svg-icons/action/delete';
 import Snackbar from 'material-ui/Snackbar';
+import RaisedButton from 'material-ui/RaisedButton';
 import numeral from 'numeral';
 
 
@@ -74,11 +75,16 @@ export default class Panel extends React.Component {
     }
 
     render() {
+        const style = {margin: 8, float: 'right'};
         return (
             <div id="panel">
               <MuiThemeProvider muiTheme={getMuiTheme()}>
                 <div>
                     {this.renderList()}
+                    <CopyToClipboard text={JSON.stringify(this.props.rectangles.map(r => this.formatBounds(r.getBounds())), null, 2)}>
+                        <RaisedButton label="全部複製" primary={true} style={style} onTouchTap={::this.handleSnackbarOpen} />
+                    </CopyToClipboard>
+                    <RaisedButton label="清空" secondary={true} style={style} onTouchTap={ () => this.props.onRectangleDelete('all') }/>
                     <Snackbar
                      open={this.state.snackbarOpen}
                      message="已複製到剪貼簿"

@@ -85,13 +85,17 @@ class App extends React.Component {
     }
 
     handleRectangleDelete(index) {
-        let { rectangles } = this.state;
-        rectangles = update(rectangles, {
-            $splice: [
-                [index, 1],
-            ],
-        });
-        this.setState({ rectangles });
+        if (typeof index === 'number') {
+            let { rectangles } = this.state;
+            rectangles = update(rectangles, {
+                $splice: [
+                    [index, 1],
+                ],
+            });
+            this.setState({ rectangles });
+        } else if (index === 'all') {
+            this.setState({ rectangles: [] });
+        }
     }
 
     render() {
