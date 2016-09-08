@@ -75,6 +75,8 @@ class App extends React.Component {
     }
 
     handleRectanglecomplete(rect) {
+        google.maps.event.clearInstanceListeners(rect);
+        rect.setMap(null);
         let { rectangles } = this.state;
         rectangles = update(rectangles, {
             $push: [rect]
@@ -82,15 +84,26 @@ class App extends React.Component {
         this.setState({ rectangles })
     }
 
+    handleRectangleDelete(index) {
+        let { rectangles } = this.state;
+        rectangles = update(rectangles, {
+            $splice: [
+                [index, 1],
+            ],
+        });
+        this.setState({ rectangles });
+    }
+
     render() {
         return (<div id="app">
             <Map
                 markers={this.state.markers}
+                rectangles={this.state.rectangles}
                 onMapClick={this.handleMapClick}
                 onMarkerRightclick={this.handleMarkerRightclick}
                 onRectanglecomplete={this.handleRectanglecomplete}
                 />
-            <Panel rectangles={this.state.rectangles} />
+            <Panel rectangles={this.state.rectangles} onRectangleDelete={::this.handleRectangleDelete} />
         </div>);
     }
 }

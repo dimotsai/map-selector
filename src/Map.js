@@ -1,8 +1,11 @@
 import React from 'react';
-import {GoogleMapLoader, GoogleMap, Marker, DrawingManager} from "react-google-maps";
+import {GoogleMapLoader, GoogleMap, Marker, DrawingManager, Rectangle} from "react-google-maps";
 
 export default function Map (props) {
-  return (
+    let rectangles = props.rectangles.map(function(rect) {
+        return <Rectangle bounds={rect.getBounds()} />
+    });
+    return (
     <section style={{height: "100%"}}>
       <GoogleMapLoader
         containerElement={
@@ -43,9 +46,10 @@ export default function Map (props) {
               }}
               onRectanglecomplete={props.onRectanglecomplete}
             />
+          {rectangles}
           </GoogleMap>
         }
       />
     </section>
-  );
+    );
 }

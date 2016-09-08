@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import CopyToClipboard from 'react-copy-to-clipboard';
+import update from "react-addons-update";
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import {List, ListItem} from 'material-ui/List';
@@ -13,6 +14,16 @@ import numeral from 'numeral';
 
 
 export default class Panel extends React.Component {
+
+    static propTypes = {
+        rectangles: React.PropTypes.array,
+        onRectangleDelete: React.PropTypes.func
+    }
+
+    static defaultProps = {
+        rectanges: [],
+        onRectangleDelete: function(idx) {}
+    }
 
     state = {
         snackbarOpen: false
@@ -33,6 +44,14 @@ export default class Panel extends React.Component {
         return {neLat, neLng, swLat, swLng};
     }
 
+    handleSnackbarOpen() {
+        this.setState({ snackbarOpen: true });
+    }
+
+    handleSnackbarClose() {
+        this.setState({ snackbarOpen: false });
+    }
+
     renderList() {
         let items = [];
         this.props.rectangles.forEach(function(r, idx, arr) {
@@ -41,7 +60,7 @@ export default class Panel extends React.Component {
             items.push(
                 <CopyToClipboard text={JSON.stringify(bounds, null, 2)}>
                     <ListItem key={idx}
-                      rightIconButton={<IconButton><ActionDelete/></IconButton>}
+                      rightIconButton={<IconButton onTouchTap={ () => this.props.onRectangleDelete(idx)}><ActionDelete/></IconButton>}
                       primaryText={text}
                       onTouchTap={::this.handleSnackbarOpen}
                     />
@@ -52,14 +71,6 @@ export default class Panel extends React.Component {
             }
         }.bind(this));
         return <List> {items} </List>;
-    }
-
-    handleSnackbarOpen() {
-        this.setState({ snackbarOpen: true });
-    }
-
-    handleSnackbarClose() {
-        this.setState({ snackbarOpen: false });
     }
 
     render() {
