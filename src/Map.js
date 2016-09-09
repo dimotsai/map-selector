@@ -1,9 +1,13 @@
 import React from 'react';
-import {GoogleMapLoader, GoogleMap, Marker, DrawingManager, Rectangle} from "react-google-maps";
+import {GoogleMapLoader, GoogleMap, Marker, DrawingManager, Rectangle, Circle} from "react-google-maps";
 
 export default function Map (props) {
-    let rectangles = props.rectangles.map(function(rect) {
-        return <Rectangle bounds={rect.getBounds()} />
+    let shapes = props.shapes.map(function(shape, idx) {
+        if (shape instanceof google.maps.Circle) {
+            return <Circle key={idx} center={shape.getCenter()} radius={shape.getRadius()} />
+        } else if (shape instanceof google.maps.Rectangle)  {
+            return <Rectangle key={idx} bounds={shape.getBounds()} />
+        }
     });
     return (
     <section style={{height: "100%"}}>
@@ -30,6 +34,7 @@ export default function Map (props) {
                   position: google.maps.ControlPosition.TOP_CENTER,
                   drawingModes: [
                     google.maps.drawing.OverlayType.RECTANGLE,
+                    google.maps.drawing.OverlayType.CIRCLE,
                   ],
                 },
                 rectangleOptions: {
@@ -39,14 +44,14 @@ export default function Map (props) {
                 },
                 circleOptions: {
                   fillOpacity: 0.5,
-                  strokeWeight: 5,
                   clickable: false,
                   editable: false
                 },
               }}
-              onRectanglecomplete={props.onRectanglecomplete}
+              onRectanglecomplete={props.onShapeComplete}
+              onCirclecomplete={props.onShapeComplete}
             />
-          {rectangles}
+          {shapes}
           </GoogleMap>
         }
       />

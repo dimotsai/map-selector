@@ -15,12 +15,12 @@ class App extends React.Component {
             key: 'Taiwan',
             defaultAnimation: 2,
         }],
-        rectangles: []
+        shapes: []
     };
 
     handleMapClick = this.handleMapClick.bind(this);
     handleMarkerRightclick = this.handleMarkerRightclick.bind(this);
-    handleRectanglecomplete = this.handleRectanglecomplete.bind(this);
+    handleShapeComplete = this.handleShapeComplete.bind(this);
 
     componentDidMount() {
         setTimeout(() => {
@@ -74,40 +74,37 @@ class App extends React.Component {
         this.setState({ markers });
     }
 
-    handleRectanglecomplete(rect) {
-        google.maps.event.clearInstanceListeners(rect);
-        rect.setMap(null);
-        let { rectangles } = this.state;
-        rectangles = update(rectangles, {
-            $push: [rect]
+    handleShapeComplete(shape) {
+        google.maps.event.clearInstanceListeners(shape);
+        shape.setMap(null);
+        let { shapes } = this.state;
+        shapes = update(shapes, {
+            $push: [shape]
         });
-        this.setState({ rectangles })
+        this.setState({ shapes })
     }
 
-    handleRectangleDelete(index) {
+    handleShapeDelete(index) {
         if (typeof index === 'number') {
-            let { rectangles } = this.state;
-            rectangles = update(rectangles, {
+            let { shapes } = this.state;
+            shapes = update(shapes, {
                 $splice: [
                     [index, 1],
                 ],
             });
-            this.setState({ rectangles });
+            this.setState({ shapes });
         } else if (index === 'all') {
-            this.setState({ rectangles: [] });
+            this.setState({ shapes: [] });
         }
     }
 
     render() {
         return (<div id="app">
             <Map
-                markers={this.state.markers}
-                rectangles={this.state.rectangles}
-                onMapClick={this.handleMapClick}
-                onMarkerRightclick={this.handleMarkerRightclick}
-                onRectanglecomplete={this.handleRectanglecomplete}
+                shapes={this.state.shapes}
+                onShapeComplete={this.handleShapeComplete}
                 />
-            <Panel rectangles={this.state.rectangles} onRectangleDelete={::this.handleRectangleDelete} />
+            <Panel shapes={this.state.shapes} onShapeDelete={::this.handleShapeDelete} />
         </div>);
     }
 }

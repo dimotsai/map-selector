@@ -17,13 +17,13 @@ import numeral from 'numeral';
 export default class Panel extends React.Component {
 
     static propTypes = {
-        rectangles: React.PropTypes.array,
-        onRectangleDelete: React.PropTypes.func
+        shapes: React.PropTypes.array,
+        onShapeDelete: React.PropTypes.func
     }
 
     static defaultProps = {
-        rectanges: [],
-        onRectangleDelete: function(idx) {}
+        shapes: [],
+        onShapeDelete: function(idx) {}
     }
 
     state = {
@@ -34,7 +34,8 @@ export default class Panel extends React.Component {
         super(props);
     }
 
-    formatBounds(bounds) {
+    formatRectangle(rectangle) {
+        let bounds = rectangle.getBounds();
         let format = '0.000000';
         let ne = bounds.getNorthEast();
         let sw = bounds.getSouthWest();
@@ -43,6 +44,15 @@ export default class Panel extends React.Component {
         let swLat = numeral(sw.lat()).format(format);
         let swLng = numeral(sw.lng()).format(format);
         return {neLat, neLng, swLat, swLng};
+    }
+
+    formatCircle(circle) {
+        let format = '0.000000';
+        return {
+            centerLat: numeral(circle.getCenter().lat()).format(format),
+            centerLng: numeral(circle.getCenter().lng()).format(format),
+            radius: numeral(circle.getRadius()).format(format)
+        };
     }
 
     handleSnackbarOpen() {
@@ -55,20 +65,30 @@ export default class Panel extends React.Component {
 
     renderList() {
         let items = [];
-        this.props.rectangles.forEach(function(r, idx, arr) {
-            let bounds = this.formatBounds(r.getBounds());
-            let text = `${bounds.neLat}, ${bounds.neLat} → ${bounds.swLat}, ${bounds.swLng}`;
+        this.props.shapes.forEach(function(s, idx, arr) {
+            let text = '';
+            let json = '';
+            if (s instanceof google.maps.Rectangle) {
+                let rect = this.formatRectangle(s);
+                text = `${rect.neLat}, ${rect.neLat} → ${rect.swLat}, ${rect.swLng}`;
+                json = JSON.stringify(rect, null, 2);
+            } else if (s instanceof google.maps.Circle) {
+                let circle = this.formatCircle(s);
+                text = `${circle.centerLat}, ${circle.centerLng} → ${circle.radius}`;
+                json = JSON.stringify(circle, null, 2);
+            }
             items.push(
-                <CopyToClipboard text={JSON.stringify(bounds, null, 2)}>
-                    <ListItem key={idx}
-                      rightIconButton={<IconButton onTouchTap={ () => this.props.onRectangleDelete(idx)}><ActionDelete/></IconButton>}
+                <CopyToClipboard key={idx} text={json}>
+                    <ListItem
+                      rightIconButton={<IconButton onTouchTap={ () => this.props.onShapeDelete(idx)}><ActionDelete/></IconButton>}
                       primaryText={text}
                       onTouchTap={::this.handleSnackbarOpen}
                     />
                 </CopyToClipboard>
             );
             if (idx != arr.length - 1) {
-                items.push(<Divider/>);
+                let key = `${idx}-d`;
+                items.push(<Divider key={key}/>);
             }
         }.bind(this));
         return <List> {items} </List>;
@@ -76,15 +96,22 @@ export default class Panel extends React.Component {
 
     render() {
         const style = {margin: 8, float: 'right'};
+        const json = JSON.stringify(this.props.shapes.map(s => {
+            if (s instanceof google.maps.Rectangle) {
+                return this.formatRectangle(s)
+            } else if (s instanceof google.maps.Circle) {
+                return this.formatCircle(s)
+            }
+        }), null, 2);
         return (
             <div id="panel">
               <MuiThemeProvider muiTheme={getMuiTheme()}>
                 <div>
                     {this.renderList()}
-                    <CopyToClipboard text={JSON.stringify(this.props.rectangles.map(r => this.formatBounds(r.getBounds())), null, 2)}>
+                    <CopyToClipboard text={json}>
                         <RaisedButton label="全部複製" primary={true} style={style} onTouchTap={::this.handleSnackbarOpen} />
                     </CopyToClipboard>
-                    <RaisedButton label="清空" secondary={true} style={style} onTouchTap={ () => this.props.onRectangleDelete('all') }/>
+                    <RaisedButton label="清空" secondary={true} style={style} onTouchTap={ () => this.props.onShapeDelete('all') }/>
                     <Snackbar
                      open={this.state.snackbarOpen}
                      message="已複製到剪貼簿"
