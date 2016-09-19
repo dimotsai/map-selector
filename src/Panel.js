@@ -70,7 +70,7 @@ export default class Panel extends React.Component {
             let json = '';
             if (s instanceof google.maps.Rectangle) {
                 let rect = this.formatRectangle(s);
-                text = `${rect.neLat}, ${rect.neLat} → ${rect.swLat}, ${rect.swLng}`;
+                text = `${rect.neLat}, ${rect.neLng} → ${rect.swLat}, ${rect.swLng}`;
                 json = JSON.stringify(rect, null, 2);
             } else if (s instanceof google.maps.Circle) {
                 let circle = this.formatCircle(s);
